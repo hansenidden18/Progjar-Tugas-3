@@ -6,9 +6,10 @@ import time
 import sys
 
 class ProcessTheClient(threading.Thread):
-	def __init__(self,connection,address):
+	def __init__(self,connection,address, response):
 		self.connection = connection
 		self.address = address
+		self.response = response
 		threading.Thread.__init__(self)
 
 	def run(self):
@@ -26,6 +27,8 @@ class ProcessTheClient(threading.Thread):
 					hasil = hasil.encode()
 					self.connection.sendall(hasil)
 					msg=""
+
+					self.response.update_response()
 				else:
 					break
 			else:
@@ -35,6 +38,7 @@ class ProcessTheClient(threading.Thread):
 class Server(threading.Thread):
 	def __init__(self):
 		self.the_clients = []
+		self.response = 0
 		self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		threading.Thread.__init__(self)
 
@@ -49,6 +53,9 @@ class Server(threading.Thread):
 			clt.start()
 			self.the_clients.append(clt)
 	
+	def update_response(self):
+		self.response += 1
+		print(f"Total response: {self.response}")
 
 def main():
 	svr = Server()
